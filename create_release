@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+CURRENT_REV=$(git rev-parse HEAD)
+
+git remote add original https://github.com/google/skia
+git fetch original --tags
+git checkout $1
+git reset $CURRENT_REV
+git checkout master -- create_release
+
+git add -A
+git commit -am "New release: $2 (original rev: $1)"
+git branch -D $2 || TRUE
+git checkout -b $2
+git tag | xargs git tag -d
+git remote remove original
